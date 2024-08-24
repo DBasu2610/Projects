@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Text To Speech</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js"></script>
+  </head>
+  <body>
+    <div class="hero">
+      <h1><b>Text to Speech</b></h1>
+      <textarea placeholder="Write here" id="text-input"></textarea>
+      <div class="row">
+        <select id="voice-select"></select>
+        <button id="speak-button"><b>Listen</b></button>
+      </div>
+    </div>
+
+    <script>
+      const speakButton = document.getElementById("speak-button");
+      const textInput = document.getElementById("text-input");
+      const synth = window.speechSynthesis;
+      const voiceSelect = document.getElementById("voice-select");
+
+      speakButton.addEventListener("click", () => {
+        const speech = new SpeechSynthesisUtterance();
+        speech.text = textInput.value;
+        window.speechSynthesis.speak(speech);
+      });
+
+      function populateVoiceList() {
+        const voices = synth.getVoices();
+        for (const voice of voices) {
+          const option = document.createElement("option");
+          option.textContent = `${voice.name} (${voice.lang})`;
+          option.setAttribute("data-lang", voice.lang);
+          option.setAttribute("data-name", voice.name);
+          voiceSelect.appendChild(option);
+        }
+      }
+
+      populateVoiceList();
+
+      if (synth.onvoiceschanged !== undefined) {
+        synth.onvoiceschanged = populateVoiceList;
+      }
+
+      document.getElementById("speak-button").addEventListener("click", () => {
+        const selectedVoiceName =
+          voiceSelect.options[voiceSelect.selectedIndex].getAttribute(
+            "data-name"
+          );
+        const selectedVoice = voices.find(
+          (voice) => voice.name === selectedVoiceName
+        );
+
+        if (selectedVoice) {
+          const speech = new SpeechSynthesisUtterance();
+          speech.text = textInput.value;
+          speech.voice = selectedVoice;
+          synth.speak(speech);
+        } else {
+          alert("Selected voice not found. Please choose a valid voice.");
+        }
+      });
+
+      voiceSelect.addEventListener("change", ()=>{
+        speech.voice = voices[voiceSelect.value];
+      })
+    </script>
+  </body>
+</html>
